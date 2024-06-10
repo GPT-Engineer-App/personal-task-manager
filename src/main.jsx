@@ -2,6 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { createClient } from '@supabase/supabase-js';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SupabaseProvider } from './integrations/supabase/index.js';
 
 const colors = {
   brand: {
@@ -13,10 +16,20 @@ const colors = {
 
 const theme = extendTheme({ colors });
 
+const supabaseUrl = import.meta.env.VITE_SUPABASE_PROJECT_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_API_KEY;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+const queryClient = new QueryClient();
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ChakraProvider theme={theme}>
-      <App />
+      <SupabaseProvider client={supabase}>
+        <QueryClientProvider client={queryClient}>
+          <App />
+        </QueryClientProvider>
+      </SupabaseProvider>
     </ChakraProvider>
   </React.StrictMode>
 );
