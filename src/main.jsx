@@ -14,7 +14,6 @@ const colors = {
 };
 
 const theme = extendTheme({ colors });
-
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
