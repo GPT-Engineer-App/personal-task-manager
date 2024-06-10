@@ -1,64 +1,139 @@
 import { createClient } from '@supabase/supabase-js';
-import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_PROJECT_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-import React from "react";
-export const queryClient = new QueryClient();
-export function SupabaseProvider({ children }) {
-    return React.createElement(QueryClientProvider, { client: queryClient }, children);
-}
+/**
+ * Types
+ * 
+ * Projects Table:
+ * - id: integer
+ * - name: text
+ * - description: text
+ * - created_at: timestamp
+ * 
+ * Todos Table:
+ * - id: integer
+ * - project_id: integer (references Projects.id)
+ * - title: text
+ * - is_complete: boolean
+ * - created_at: timestamp
+ */
 
-const fromSupabase = async (query) => {
-    const { data, error } = await query;
-    if (error) throw new Error(error.message);
-    return data;
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+// Fetch all projects
+export const useProjects = () => {
+  return useQuery({
+    queryKey: ['projects'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('projects').select('*');
+      if (error) throw new Error(error.message);
+      return data;
+    },
+  });
 };
 
-/* supabase integration types
-
-// EXAMPLE TYPES SECTION
-// DO NOT USE TYPESCRIPT
-
-Foo // table: foos
-    id: number
-    title: string
-
-Bar // table: bars
-    id: number
-    foo_id: number // foreign key to Foo
-	
-*/
-
-// Example hook for models
-
-export const useFoo = ()=> useQuery({
-    queryKey: ['foo'],
-    queryFn: fromSupabase(supabase.from('foo')),
-})
-export const useAddFoo = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (newFoo)=> fromSupabase(supabase.from('foo').insert([{ title: newFoo.title }])),
-        onSuccess: ()=> {
-            queryClient.invalidateQueries('foo');
-        },
-    });
+// Fetch all todos for a project
+export const useTodos = (projectId) => {
+  return useQuery({
+    queryKey: ['todos', projectId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('todos').select('*').eq('project_id', projectId);
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    enabled: !!projectId,
+  });
 };
 
-export const useBar = ()=> useQuery({
-    queryKey: ['bar'],
-    queryFn: fromSupabase(supabase.from('bar')),
-})
-export const useAddBar = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (newBar)=> fromSupabase(supabase.from('bar').insert([{ foo_id: newBar.foo_id }])),
-        onSuccess: ()=> {
-            queryClient.invalidateQueries('bar');
-        },
-    });
+// Create a new project
+export const useCreateProject = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (newProject) => {
+      const { data, error } = await supabase.from('projects').insert(newProject);
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['projects']);
+    },
+  });
 };
 
+// Create a new todo
+export const useCreateTodo = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (newTodo) => {
+      const { data, error } = await supabase.from('todos').insert(newTodo);
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries(['todos', variables.project_id]);
+    },
+  });
+};
+
+// Update a project
+export const useUpdateProject = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (updatedProject) => {
+      const { data, error } = await supabase.from('projects').update(updatedProject).eq('id', updatedProject.id);
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['projects']);
+    },
+  });
+};
+
+// Update a todo
+export const useUpdateTodo = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (updatedTodo) => {
+      const { data, error } = await supabase.from('todos').update(updatedTodo).eq('id', updatedTodo.id);
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries(['todos', variables.project_id]);
+    },
+  });
+};
+
+// Delete a project
+export const useDeleteProject = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (projectId) => {
+      const { data, error } = await supabase.from('projects').delete().eq('id', projectId);
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['projects']);
+    },
+  });
+};
+
+// Delete a todo
+export const useDeleteTodo = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (todoId) => {
+      const { data, error } = await supabase.from('todos').delete().eq('id', todoId);
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries(['todos', variables.project_id]);
+    },
+  });
+};
