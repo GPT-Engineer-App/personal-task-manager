@@ -34,9 +34,7 @@ const Index = () => {
   return (
     <Container centerContent maxW="container.md" height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
       <VStack spacing={4}>
-        <Box>
-          <Heading as="h1" size="xl">Projects</Heading>
-        </Box>
+        <Heading as="h1" size="xl">Projects</Heading>
         <Button onClick={handleAddProject}>Add Project</Button>
         {projectsLoading ? (
           <Text>Loading projects...</Text>
@@ -68,9 +66,7 @@ const Index = () => {
         )}
         {selectedProjectId && (
           <>
-            <Box>
-              <Heading as="h2" size="lg">Todos</Heading>
-            </Box>
+            <Heading as="h2" size="lg">Todos</Heading>
             <Button onClick={handleAddTodo}>Add Todo</Button>
             {todosLoading ? (
               <Text>Loading todos...</Text>
