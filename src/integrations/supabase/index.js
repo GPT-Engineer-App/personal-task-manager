@@ -19,132 +19,91 @@ const fromSupabase = async (query) => {
 
 /* supabase integration types
 
-// EXAMPLE TYPES SECTION
-// DO NOT USE TYPESCRIPT
-
-Foo // table: foos
-    id: number
-    title: string
-
-Bar // table: bars
-    id: number
-    foo_id: number // foreign key to Foo
-
-Task // table: tasks
+Project // table: projects
     id: number
     title: string
     description: string
     status: string
     created_at: string
 
-User // table: users
+Todo // table: todos
     id: number
-    email: string
-    password: string
+    project_id: number // foreign key to Project
+    title: string
+    description: string
+    status: string
     created_at: string
 
 */
 
-// Hooks for Foo
-export const useFoo = () => useQuery({
-    queryKey: ['foo'],
-    queryFn: () => fromSupabase(supabase.from('foo').select('*')),
+// Hooks for Project
+export const useProjects = () => useQuery({
+    queryKey: ['projects'],
+    queryFn: () => fromSupabase(supabase.from('projects').select('*')),
 });
 
-export const useAddFoo = () => {
+export const useAddProject = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newFoo) => fromSupabase(supabase.from('foo').insert([{ title: newFoo.title }])),
+        mutationFn: (newProject) => fromSupabase(supabase.from('projects').insert([{ title: newProject.title, description: newProject.description, status: newProject.status }])),
         onSuccess: () => {
-            queryClient.invalidateQueries('foo');
+            queryClient.invalidateQueries('projects');
         },
     });
 };
 
-// Hooks for Bar
-export const useBar = () => useQuery({
-    queryKey: ['bar'],
-    queryFn: () => fromSupabase(supabase.from('bar').select('*')),
+export const useUpdateProject = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (updatedProject) => fromSupabase(supabase.from('projects').update({ title: updatedProject.title, description: updatedProject.description, status: updatedProject.status }).eq('id', updatedProject.id)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('projects');
+        },
+    });
+};
+
+export const useDeleteProject = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (projectId) => fromSupabase(supabase.from('projects').delete().eq('id', projectId)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('projects');
+        },
+    });
+};
+
+// Hooks for Todo
+export const useTodos = () => useQuery({
+    queryKey: ['todos'],
+    queryFn: () => fromSupabase(supabase.from('todos').select('*')),
 });
 
-export const useAddBar = () => {
+export const useAddTodo = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newBar) => fromSupabase(supabase.from('bar').insert([{ foo_id: newBar.foo_id }])),
+        mutationFn: (newTodo) => fromSupabase(supabase.from('todos').insert([{ project_id: newTodo.project_id, title: newTodo.title, description: newTodo.description, status: newTodo.status }])),
         onSuccess: () => {
-            queryClient.invalidateQueries('bar');
+            queryClient.invalidateQueries('todos');
         },
     });
 };
 
-// Hooks for Task
-export const useTasks = () => useQuery({
-    queryKey: ['tasks'],
-    queryFn: () => fromSupabase(supabase.from('tasks').select('*')),
-});
-
-export const useAddTask = () => {
+export const useUpdateTodo = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newTask) => fromSupabase(supabase.from('tasks').insert([{ title: newTask.title, description: newTask.description, status: newTask.status }])),
+        mutationFn: (updatedTodo) => fromSupabase(supabase.from('todos').update({ title: updatedTodo.title, description: updatedTodo.description, status: updatedTodo.status }).eq('id', updatedTodo.id)),
         onSuccess: () => {
-            queryClient.invalidateQueries('tasks');
+            queryClient.invalidateQueries('todos');
         },
     });
 };
 
-export const useUpdateTask = () => {
+export const useDeleteTodo = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (updatedTask) => fromSupabase(supabase.from('tasks').update({ title: updatedTask.title, description: updatedTask.description, status: updatedTask.status }).eq('id', updatedTask.id)),
+        mutationFn: (todoId) => fromSupabase(supabase.from('todos').delete().eq('id', todoId)),
         onSuccess: () => {
-            queryClient.invalidateQueries('tasks');
-        },
-    });
-};
-
-export const useDeleteTask = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (taskId) => fromSupabase(supabase.from('tasks').delete().eq('id', taskId)),
-        onSuccess: () => {
-            queryClient.invalidateQueries('tasks');
-        },
-    });
-};
-
-// Hooks for User
-export const useUsers = () => useQuery({
-    queryKey: ['users'],
-    queryFn: () => fromSupabase(supabase.from('users').select('*')),
-});
-
-export const useAddUser = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (newUser) => fromSupabase(supabase.from('users').insert([{ email: newUser.email, password: newUser.password }])),
-        onSuccess: () => {
-            queryClient.invalidateQueries('users');
-        },
-    });
-};
-
-export const useUpdateUser = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (updatedUser) => fromSupabase(supabase.from('users').update({ email: updatedUser.email, password: updatedUser.password }).eq('id', updatedUser.id)),
-        onSuccess: () => {
-            queryClient.invalidateQueries('users');
-        },
-    });
-};
-
-export const useDeleteUser = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (userId) => fromSupabase(supabase.from('users').delete().eq('id', userId)),
-        onSuccess: () => {
-            queryClient.invalidateQueries('users');
+            queryClient.invalidateQueries('todos');
         },
     });
 };
