@@ -23,11 +23,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-/**
- * Fetch all projects from the database
- * 
- * @returns {Array} List of projects
- */
+// Fetch all projects
 export const useProjects = () => {
   return useQuery({
     queryKey: ['projects'],
