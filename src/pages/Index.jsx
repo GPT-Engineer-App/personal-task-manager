@@ -14,7 +14,7 @@ const Index = () => {
   const deleteProjectMutation = useDeleteProject();
   const deleteTodoMutation = useDeleteTodo();
 
-  // Function to handle project creation
+  // Function to handle the creation of a new project
   const handleCreateProject = () => {
     const projectName = prompt('Enter project name:');
     if (projectName) {

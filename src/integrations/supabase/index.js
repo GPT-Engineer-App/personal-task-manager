@@ -23,13 +23,14 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-// Fetch all projects
+// Fetch all projects with logging
 export const useProjects = () => {
   return useQuery({
     queryKey: ['projects'],
     queryFn: async () => {
       const { data, error } = await supabase.from('projects').select('*');
       if (error) throw new Error(error.message);
+      console.log('Fetched projects:', data);
       return data;
     },
   });
