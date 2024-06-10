@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { createContext, useContext } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_PROJECT_URL;
@@ -19,6 +20,10 @@ export const SupabaseProvider = ({ children }) => {
       </QueryClientProvider>
     </SupabaseContext.Provider>
   );
+};
+
+SupabaseProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export const useSupabase = () => {
