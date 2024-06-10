@@ -21,18 +21,14 @@ const fromSupabase = async (query) => {
 
 Project // table: projects
     id: number
-    title: string
-    description: string
-    status: string
-    created_at: string
+    name: string
+    state: string
 
 Todo // table: todos
     id: number
     project_id: number // foreign key to Project
-    title: string
     description: string
-    status: string
-    created_at: string
+    state: string
 
 */
 
@@ -45,7 +41,7 @@ export const useProjects = () => useQuery({
 export const useAddProject = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newProject) => fromSupabase(supabase.from('projects').insert([{ title: newProject.title, description: newProject.description, status: newProject.status }])),
+        mutationFn: (newProject) => fromSupabase(supabase.from('projects').insert([{ name: newProject.name, state: newProject.state }])),
         onSuccess: () => {
             queryClient.invalidateQueries('projects');
         },
@@ -55,7 +51,7 @@ export const useAddProject = () => {
 export const useUpdateProject = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (updatedProject) => fromSupabase(supabase.from('projects').update({ title: updatedProject.title, description: updatedProject.description, status: updatedProject.status }).eq('id', updatedProject.id)),
+        mutationFn: (updatedProject) => fromSupabase(supabase.from('projects').update({ name: updatedProject.name, state: updatedProject.state }).eq('id', updatedProject.id)),
         onSuccess: () => {
             queryClient.invalidateQueries('projects');
         },
@@ -81,7 +77,7 @@ export const useTodos = () => useQuery({
 export const useAddTodo = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newTodo) => fromSupabase(supabase.from('todos').insert([{ project_id: newTodo.project_id, title: newTodo.title, description: newTodo.description, status: newTodo.status }])),
+        mutationFn: (newTodo) => fromSupabase(supabase.from('todos').insert([{ project_id: newTodo.project_id, description: newTodo.description, state: newTodo.state }])),
         onSuccess: () => {
             queryClient.invalidateQueries('todos');
         },
@@ -91,7 +87,7 @@ export const useAddTodo = () => {
 export const useUpdateTodo = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (updatedTodo) => fromSupabase(supabase.from('todos').update({ title: updatedTodo.title, description: updatedTodo.description, status: updatedTodo.status }).eq('id', updatedTodo.id)),
+        mutationFn: (updatedTodo) => fromSupabase(supabase.from('todos').update({ project_id: updatedTodo.project_id, description: updatedTodo.description, state: updatedTodo.state }).eq('id', updatedTodo.id)),
         onSuccess: () => {
             queryClient.invalidateQueries('todos');
         },
