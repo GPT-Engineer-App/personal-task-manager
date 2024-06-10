@@ -34,7 +34,7 @@ const Index = () => {
   return (
     <Container centerContent maxW="container.md" height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
       <VStack spacing={4}>
-        <Heading as="h1" size="xl">Projects</Heading>
+        <Heading as="h1" size="xl">Project List</Heading>
         <Button onClick={handleAddProject}>Add Project</Button>
         {projectsLoading ? (
           <Text>Loading projects...</Text>
