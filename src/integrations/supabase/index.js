@@ -19,46 +19,88 @@ const fromSupabase = async (query) => {
 
 /* supabase integration types
 
-// EXAMPLE TYPES SECTION
-// DO NOT USE TYPESCRIPT
-
-Foo // table: foos
+Project // table: projects
     id: number
+    name: string
+    description: string
+    state: string
+
+Todo // table: todos
+    id: number
+    project_id: number // foreign key to Project
     title: string
+    state: string
 
-Bar // table: bars
-    id: number
-    foo_id: number // foreign key to Foo
-	
 */
 
-// Example hook for models
+// Hooks for Project
+export const useProjects = () => useQuery({
+    queryKey: ['projects'],
+    queryFn: () => fromSupabase(supabase.from('projects').select('*')),
+});
 
-export const useFoo = ()=> useQuery({
-    queryKey: ['foo'],
-    queryFn: fromSupabase(supabase.from('foo')),
-})
-export const useAddFoo = () => {
+export const useAddProject = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newFoo)=> fromSupabase(supabase.from('foo').insert([{ title: newFoo.title }])),
-        onSuccess: ()=> {
-            queryClient.invalidateQueries('foo');
+        mutationFn: (newProject) => fromSupabase(supabase.from('projects').insert([newProject])),
+        onSuccess: () => {
+            queryClient.invalidateQueries('projects');
         },
     });
 };
 
-export const useBar = ()=> useQuery({
-    queryKey: ['bar'],
-    queryFn: fromSupabase(supabase.from('bar')),
-})
-export const useAddBar = () => {
+export const useUpdateProject = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newBar)=> fromSupabase(supabase.from('bar').insert([{ foo_id: newBar.foo_id }])),
-        onSuccess: ()=> {
-            queryClient.invalidateQueries('bar');
+        mutationFn: (updatedProject) => fromSupabase(supabase.from('projects').update(updatedProject).eq('id', updatedProject.id)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('projects');
         },
     });
 };
 
+export const useDeleteProject = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (projectId) => fromSupabase(supabase.from('projects').delete().eq('id', projectId)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('projects');
+        },
+    });
+};
+
+// Hooks for Todo
+export const useTodos = (projectId) => useQuery({
+    queryKey: ['todos', projectId],
+    queryFn: () => fromSupabase(supabase.from('todos').select('*').eq('project_id', projectId)),
+});
+
+export const useAddTodo = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (newTodo) => fromSupabase(supabase.from('todos').insert([newTodo])),
+        onSuccess: () => {
+            queryClient.invalidateQueries('todos');
+        },
+    });
+};
+
+export const useUpdateTodo = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (updatedTodo) => fromSupabase(supabase.from('todos').update(updatedTodo).eq('id', updatedTodo.id)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('todos');
+        },
+    });
+};
+
+export const useDeleteTodo = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (todoId) => fromSupabase(supabase.from('todos').delete().eq('id', todoId)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('todos');
+        },
+    });
+};
